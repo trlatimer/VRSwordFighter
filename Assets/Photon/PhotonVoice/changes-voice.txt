@@ -1,19 +1,5 @@
 Photon Voice 2 Change Log
 
-v2.29 (December 24th, 2021)
-   PUN2: v2.40 (14f52ea) [RT/lib:4.1.6.11]
-   PhotonVoiceApi: revision 6315
-   ADDED: [Nintendo Switch] audio input (Photon microphone type) and audio devices change detection via native plugin (requires separate add-on).
-   FIXED: Recorder now sends PhotonVoiceRemoved message inside OnDestroy as component may be destoryed (processors need to disposed of) while GameObject remains.
-   FIXED: [WebRtcAudioDsp.AEC] issues due to thread safety (Unity main thread vs. OnAudioFilterRead thread).
-   ADDED: [WebRtcAudioDsp.AEC] AutoRestartOnAudioChannelsMismatch to toggle behaviour (default is true).
-   ADDED: [WebRtcAudioDsp.AEC] more logging to help debugging in case of issues.
-   CHANGED: [WebRtcAudioDsp.AEC] more refactoring to help handle edge cases better/clearer.
-   CHANGED: [WebRtcAudioDsp] auto restart when needed due to changes detected using OnAudioConfigurationChanged.
-   CHANGED: [WebRtcAudioDsp] minor, ForceNormalAecInMobile is made field instead of property.
-   CHANGED: disposing of Recorder.inputSource and setting it to null early in all case of recording start failures.
-   FIXED: [Editor Only, WebGL] minor, error due to empty Microphone.devices.
-
 v2.28.2 (December 3rd, 2021)
    PUN2: v2.40 (14f52ea) [RT/lib:4.1.6.11]
    PhotonVoiceApi: revision 6306

@@ -26,8 +26,6 @@ namespace Photon.Voice
             return new IOS.AudioInChangeNotifier(callback, logger);
 #elif UNITY_EDITOR_OSX || UNITY_STANDALONE_OSX
             return new MacOS.AudioInChangeNotifier(callback, logger);
-#elif UNITY_SWITCH && !UNITY_EDITOR
-            return new Switch.AudioInChangeNotifier(callback, logger);
 #else
             return new AudioInChangeNotifierNotSupported(callback, logger);
 #endif
@@ -71,8 +69,6 @@ namespace Photon.Voice
             }            
 #elif UNITY_WSA && !UNITY_EDITOR
             return new UWP.AudioInPusher(logger, samplingRate, channels, dev.IsDefault ? "" : dev.IDString);
-#elif UNITY_SWITCH && !UNITY_EDITOR
-            return new Switch.AudioInPusher(logger);
 #elif UNITY_5_3_OR_NEWER // #if UNITY
             return new Unity.MicWrapper(dev.IDString, samplingRate, logger);
 #else

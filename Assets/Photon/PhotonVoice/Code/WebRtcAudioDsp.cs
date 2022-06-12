@@ -9,7 +9,6 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace Photon.Voice.Unity
 {
@@ -68,22 +67,16 @@ namespace Photon.Voice.Unity
             {AudioSpeakerMode.Prologic, 2}
         };
 
-        private LocalVoiceAudioShort localVoice;
+        private LocalVoice localVoice;
         private int outputSampleRate;
 
         private Recorder recorder;
 
-        #if UNITY_EDITOR || UNITY_ANDROID || UNITY_IOS
-        [FormerlySerializedAs("forceNormalAecInMobile")]
-        public bool ForceNormalAecInMobile;
-        #endif
+        [SerializeField]
+        private bool forceNormalAecInMobile;
 
         [SerializeField]
         private bool aecOnlyWhenEnabled = true;
-
-        public bool AutoRestartOnAudioChannelsMismatch = true;
-
-        private object threadSafety = new object();
 
         #endregion
 
@@ -93,12 +86,9 @@ namespace Photon.Voice.Unity
         {
             get
             {
-                lock (this.threadSafety)
+                if (this.IsInitialized && (!this.AecOnlyWhenEnabled || this.isActiveAndEnabled))
                 {
-                    if (this.IsInitialized && (!this.aecOnlyWhenEnabled || this.isActiveAndEnabled))
-                    {
-                        return this.aecStarted;
-                    }
+                    return this.aecStarted;
                 }
                 return this.aec;
             }
@@ -109,10 +99,7 @@ namespace Photon.Voice.Unity
                     return;
                 }
                 this.aec = value;
-                lock (this.threadSafety)
-                {
-                    this.ToggleAec();
-                }
+                this.ToggleAec();
             }
         }
 
@@ -139,12 +126,9 @@ namespace Photon.Voice.Unity
                     return;
                 }
                 this.aecHighPass = value;
-                lock (this.threadSafety)
+                if (this.IsInitialized)
                 {
-                    if (this.IsInitialized)
-                    {
-                        this.proc.AECHighPass = this.aecHighPass;
-                    }
+                    this.proc.AECHighPass = this.aecHighPass;
                 }
             }
         }
@@ -159,13 +143,10 @@ namespace Photon.Voice.Unity
                     return;
                 }
                 this.reverseStreamDelayMs = value;
-                lock (this.threadSafety)
+                if (this.IsInitialized)
                 {
-                    if (this.IsInitialized)
-                    {
-                        this.proc.AECStreamDelayMs = this.reverseStreamDelayMs;
-                    } 
-                }
+                    this.proc.AECStreamDelayMs = this.reverseStreamDelayMs;
+                } 
             }
         }
 
@@ -179,12 +160,9 @@ namespace Photon.Voice.Unity
                     return;
                 }
                 this.noiseSuppression = value;
-                lock (this.threadSafety)
+                if (this.IsInitialized)
                 {
-                    if (this.IsInitialized)
-                    {
-                        this.proc.NoiseSuppression = this.noiseSuppression;
-                    }
+                    this.proc.NoiseSuppression = this.noiseSuppression;
                 }
             }
         }
@@ -199,12 +177,9 @@ namespace Photon.Voice.Unity
                     return;
                 }
                 this.highPass = value;
-                lock (this.threadSafety)
+                if (this.IsInitialized)
                 {
-                    if (this.IsInitialized)
-                    {
-                        this.proc.HighPass = this.highPass;
-                    }
+                    this.proc.HighPass = this.highPass;
                 }
             }
         }
@@ -236,12 +211,9 @@ namespace Photon.Voice.Unity
                     return;
                 }
                 this.agc = value;
-                lock (this.threadSafety)
+                if (this.IsInitialized)
                 {
-                    if (this.IsInitialized)
-                    {
-                        this.proc.AGC = this.agc;
-                    }
+                    this.proc.AGC = this.agc;
                 }
             }
         }
@@ -267,12 +239,9 @@ namespace Photon.Voice.Unity
                     return;
                 }
                 this.agcCompressionGain = value;
-                lock (this.threadSafety)
+                if (this.IsInitialized)
                 {
-                    if (this.IsInitialized)
-                    {
-                        this.proc.AGCCompressionGain = this.agcCompressionGain;
-                    }
+                    this.proc.AGCCompressionGain = this.agcCompressionGain;
                 }
             }
         }
@@ -287,14 +256,17 @@ namespace Photon.Voice.Unity
                     return;
                 }
                 this.vad = value;
-                lock (this.threadSafety)
+                if (this.IsInitialized)
                 {
-                    if (this.IsInitialized)
-                    {
-                        this.proc.VAD = this.vad;
-                    }
+                    this.proc.VAD = this.vad;
                 }
             }
+        }
+
+        public bool ForceNormalAecInMobile
+        {
+            get { return this.forceNormalAecInMobile; }
+            set { this.forceNormalAecInMobile = value; }
         }
 
         public bool IsInitialized
@@ -316,10 +288,7 @@ namespace Photon.Voice.Unity
                 if (this.aecOnlyWhenEnabled != value)
                 {
                     this.aecOnlyWhenEnabled = value;
-                    lock (this.threadSafety)
-                    {
-                        this.ToggleAec();
-                    }
+                    this.ToggleAec();
                 }
             }
         }
@@ -331,7 +300,6 @@ namespace Photon.Voice.Unity
         protected override void Awake()
         {
             base.Awake();
-            AudioSettings.OnAudioConfigurationChanged += this.OnAudioConfigurationChanged;
             if (this.SupportedPlatformCheck())
             {
                 this.recorder = this.GetComponent<Recorder>();
@@ -353,34 +321,28 @@ namespace Photon.Voice.Unity
 
         private void OnEnable()
         {
-            lock (this.threadSafety)
+            if (this.SupportedPlatformCheck())
             {
-                if (this.SupportedPlatformCheck())
+                if (this.IsInitialized)
                 {
-                    if (this.IsInitialized)
+                    this.ToggleAec();
+                } 
+                else if (this.recorder.IsRecording)
+                {
+                    if (this.Logger.IsWarningEnabled)
                     {
-                        this.ToggleAec();
-                    } 
-                    else if (this.recorder.IsRecording)
-                    {
-                        if (this.Logger.IsWarningEnabled)
-                        {
-                            this.Logger.LogWarning("WebRtcAudioDsp is added after recording has started, restarting recording to take effect");
-                        }
-                        this.recorder.RestartRecording(true);
+                        this.Logger.LogWarning("WebRtcAudioDsp is added after recording has started, restarting recording to take effect");
                     }
+                    this.recorder.RestartRecording(true);
                 }
             }
         }
 
         private void OnDisable()
         {
-            lock (this.threadSafety)
+            if (this.AecOnlyWhenEnabled && this.aecStarted)
             {
-                if (this.aecOnlyWhenEnabled && this.aecStarted)
-                {
-                    this.ToggleAecOutputListener(false);
-                }
+               this.ToggleAecOutputListener(false);
             }
         }
 
@@ -406,7 +368,7 @@ namespace Photon.Voice.Unity
 
         private void ToggleAec()
         {
-            if (this.IsInitialized && (!this.aecOnlyWhenEnabled || this.isActiveAndEnabled) && this.aec != this.aecStarted)
+            if (this.IsInitialized && (!this.AecOnlyWhenEnabled || this.isActiveAndEnabled) && this.aec != this.aecStarted)
             {
                 if (this.Logger.IsDebugEnabled)
                 {
@@ -432,7 +394,7 @@ namespace Photon.Voice.Unity
             {
                 if (on)
                 {
-                    if (this.aecOnlyWhenEnabled && !this.isActiveAndEnabled)
+                    if (this.AecOnlyWhenEnabled && !this.isActiveAndEnabled)
                     {
                         if (this.Logger.IsErrorEnabled)
                         {
@@ -473,7 +435,21 @@ namespace Photon.Voice.Unity
                     }
                     if (this.IsInitialized) 
                     {
-                        this.StartAec();
+                        this.proc.AECStreamDelayMs = this.ReverseStreamDelayMs;
+                        this.proc.AECHighPass = this.AecHighPass;
+                        #if !UNITY_EDITOR && (UNITY_IOS || UNITY_ANDROID)
+                        this.proc.AEC = this.ForceNormalAecInMobile;
+                        this.proc.AECMobile = !this.ForceNormalAecInMobile;
+                        #else
+                        this.proc.AEC = true;
+                        this.proc.AECMobile = false;
+                        #endif
+                        this.aecStarted = true;
+                        this.audioOutCapture.OnAudioFrame += this.OnAudioOutFrameFloat;
+                        if (this.Logger.IsDebugEnabled)
+                        {
+                            this.Logger.LogDebug("AEC OutputListener started.");
+                        }
                     }
                 }
                 else 
@@ -505,146 +481,63 @@ namespace Photon.Voice.Unity
             return false;
         }
 
-        private void StartAec()
-        {
-            this.proc.AECStreamDelayMs = this.reverseStreamDelayMs;
-            this.proc.AECHighPass = this.aecHighPass;
-            #if !UNITY_EDITOR && (UNITY_IOS || UNITY_ANDROID)
-            this.proc.AEC = this.ForceNormalAecInMobile;
-            this.proc.AECMobile = !this.ForceNormalAecInMobile;
-            #else
-            this.proc.AEC = true;
-            this.proc.AECMobile = false;
-            #endif
-            this.aecStarted = true;
-            this.audioOutCapture.OnAudioFrame += this.OnAudioOutFrameFloat;
-            if (this.Logger.IsDebugEnabled)
-            {
-                this.Logger.LogDebug("AEC OutputListener started.");
-            }
-        }
-
-        private void OnAudioConfigurationChanged(bool deviceWasChanged)
-        {
-            lock (this.threadSafety)
-            {
-                if (this.IsInitialized)
-                {
-                    bool restart = false;
-                    if (this.outputSampleRate != AudioSettings.outputSampleRate)
-                    {
-                        if (this.Logger.IsInfoEnabled)
-                        {
-                            this.Logger.LogInfo("AudioConfigChange: outputSampleRate from {0} to {1}. WebRtcAudioDsp will be restarted.", this.outputSampleRate, AudioSettings.outputSampleRate);
-                        }
-                        this.outputSampleRate = AudioSettings.outputSampleRate;
-                        restart = true;
-                    }
-                    if (this.reverseChannels != channelsMap[AudioSettings.speakerMode])
-                    {
-                        if (this.Logger.IsInfoEnabled)
-                        {
-                            this.Logger.LogInfo("AudioConfigChange: speakerMode channels from {0} to {1}. WebRtcAudioDsp will be restarted.", this.reverseChannels, channelsMap[AudioSettings.speakerMode]);
-                        }
-                        this.reverseChannels = channelsMap[AudioSettings.speakerMode];
-                        restart = true;
-                    }
-                    if (restart)
-                    {
-                        this.Restart();
-                    }
-                }
-            }
-        }
-
-        // triggered by OnAudioFilterRead which is called on a different thread from the main thread (namely the audio thread)
-        // so calling into many Unity functions from this function is not allowed (if you try, a warning shows up at run time)
         private void OnAudioOutFrameFloat(float[] data, int outChannels)
         {
-            lock (this.threadSafety)
+            if (outChannels != this.reverseChannels)
             {
-                if (!this.IsInitialized)
+                if (this.Logger.IsErrorEnabled)
                 {
-                    if (this.Logger.IsErrorEnabled)
-                    {
-                        this.Logger.LogError("Unexpected: OnAudioOutFrame called while WebRtcAudioDsp is not initialized (proc == null).");
-                    }
-                    return;
+                    this.Logger.LogError("OnAudioOutFrame channel count {0} != initialized {1}.  Switching channels and restarting.", outChannels, this.reverseChannels);
                 }
-                if (!this.aecStarted)
-                {
-                    if (this.Logger.IsErrorEnabled)
-                    {
-                        this.Logger.LogError("Unexpected: OnAudioOutFrame called while aecStarted is false.");
-                    }
-                }
-                if (outChannels != this.reverseChannels)
-                {
-                    if (this.Logger.IsErrorEnabled)
-                    {
-                        this.Logger.LogError("Unexpected: OnAudioOutFrame channel count {0} != initialized {1}. Switching channels and restarting.", outChannels, this.reverseChannels);
-                    }
-                    if (this.AutoRestartOnAudioChannelsMismatch)
-                    {
-                        this.reverseChannels = outChannels;
-                        this.Restart();
-                    }
-                    return;
-                }
-                this.proc.OnAudioOutFrameFloat(data);
+                this.reverseChannels = outChannels;
+                this.Restart();
             }
+            this.proc.OnAudioOutFrameFloat(data);
         }
 
-        // Unity message sent by Recorder
+        // Message sent by Recorder
         private void PhotonVoiceCreated(PhotonVoiceCreatedParams p)
         {
-            lock (this.threadSafety)
+            if (!this.enabled)
             {
-                if (!this.enabled)
+                return;
+            }
+            if (this.recorder != null && this.recorder.SourceType != Recorder.InputSourceType.Microphone)
+            {
+                if (this.Logger.IsWarningEnabled)
                 {
-                    if (this.Logger.IsInfoEnabled)
-                    {
-                        this.Logger.LogInfo("Skipped PhotonVoiceCreated message because component is disabled.");
-                    }
-                    return;
-                }
-                if (this.recorder != null && this.recorder.SourceType != Recorder.InputSourceType.Microphone)
-                {
-                    if (this.Logger.IsWarningEnabled)
-                    {
-                        this.Logger.LogWarning("WebRtcAudioDsp is better suited to be used with Microphone as Recorder Input Source Type.");
-                    }
-                }
-                if (p.Voice.Info.Channels != 1)
-                {
-                    if (this.Logger.IsErrorEnabled)
-                    {
-                        this.Logger.LogError("Only mono audio signals supported. WebRtcAudioDsp component will be disabled.");
-                    }
-                    this.enabled = false;
-                    return;
-                }
-                if (p.Voice is LocalVoiceAudioShort voice)
-                {
-                    this.localVoice = voice;
-                    this.reverseChannels = channelsMap[AudioSettings.speakerMode];
-                    this.outputSampleRate = AudioSettings.outputSampleRate;
-                    this.Init();
-                    this.localVoice.AddPostProcessor(this.proc);
-                    this.ToggleAec();
-                }
-                else
-                {
-                    if (this.Logger.IsErrorEnabled)
-                    {
-                        this.Logger.LogError("Only short audio voice supported. WebRtcAudioDsp component will be disabled.");
-                    }
-                    this.enabled = false;
+                    this.Logger.LogWarning("WebRtcAudioDsp is better suited to be used with Microphone as Recorder Input Source Type.");
                 }
             }
+            this.localVoice = p.Voice;
+            if (this.localVoice.Info.Channels != 1)
+            {
+                if (this.Logger.IsErrorEnabled)
+                {
+                    this.Logger.LogError("Only mono audio signals supported.");
+                }
+                this.enabled = false;
+                return;
+            }
+            if (!(this.localVoice is LocalVoiceAudioShort))
+            {
+                if (this.Logger.IsErrorEnabled)
+                {
+                    this.Logger.LogError("Only short audio voice supported.");
+                }
+                this.enabled = false;
+                return;
+            }
+
+            // can't access the AudioSettings properties in InitAEC if it's called from not main thread
+            this.reverseChannels = channelsMap[AudioSettings.speakerMode];
+            this.outputSampleRate = AudioSettings.outputSampleRate;
+            this.Init();
+            LocalVoiceAudioShort v = this.localVoice as LocalVoiceAudioShort;
+            v.AddPostProcessor(this.proc);
+            this.ToggleAec();
         }
 
-        // Unity message sent by Recorder
         private void PhotonVoiceRemoved()
         {
             this.StopAllProcessing();
@@ -653,97 +546,39 @@ namespace Photon.Voice.Unity
         private void OnDestroy()
         {
             this.StopAllProcessing();
-            AudioSettings.OnAudioConfigurationChanged -= this.OnAudioConfigurationChanged;
         }
 
         private void StopAllProcessing()
         {
-            lock (this.threadSafety)
-            {
-                this.ToggleAecOutputListener(false);
-                if (this.IsInitialized)
-                {
-                    this.proc.Dispose();
-                    this.proc = null;
-                }
-                this.localVoice = null;   
-            }
-        }
-
-        // called from different thread, do not call any Unity API
-        private void Restart()
-        {
-            if (this.Logger.IsDebugEnabled)
-            {
-                this.Logger.LogDebug("Restarting");
-            }
+            this.ToggleAecOutputListener(false);
             if (this.IsInitialized)
             {
-                bool aecWasStarted = false;
-                if (this.aecStarted)
-                {
-                    if (this.UnsubscribeFromAudioOutCapture(false))
-                    {
-                        if (this.Logger.IsDebugEnabled)
-                        {
-                            this.Logger.LogDebug("AEC OutputListener stopped.");
-                        }
-                        aecWasStarted = true;
-                        this.aecStarted = false;
-                    }
-                    else if (this.Logger.IsWarningEnabled)
-                    {
-                        this.Logger.LogWarning("Unexpected: AudioOutCapture is null but aecStarted == true");
-                    }
-                }
                 this.proc.Dispose();
                 this.proc = null;
-                if (this.Init())
-                {
-                    this.localVoice.AddPostProcessor(this.proc);
-                    if (aecWasStarted)
-                    {
-                        this.StartAec();
-                    }
-                    if (this.Logger.IsInfoEnabled)
-                    {
-                        this.Logger.LogInfo("Restart complete successfully.");
-                    }
-                }
-                else if (this.Logger.IsErrorEnabled)
-                {
-                    this.Logger.LogError("Restart failed because processor could not be re initialized.");
-                }
-            } 
-            else if (this.Logger.IsErrorEnabled)
-            {
-                this.Logger.LogError("Cannot restart if not initialized.");
             }
         }
 
-        private bool Init()
+        private void Restart()
         {
-            if (this.IsInitialized)
-            {
-                if (this.Logger.IsErrorEnabled)
-                {
-                    this.Logger.LogError("Already initialized");
-                }
-                return false;
-            }
+            this.StopAllProcessing();
+            this.Init();
+            this.ToggleAec();
+        }
+
+        private void Init()
+        {
             this.proc = new WebRTCAudioProcessor(this.Logger, this.localVoice.Info.FrameSize, this.localVoice.Info.SamplingRate,
                 this.localVoice.Info.Channels, this.outputSampleRate, this.reverseChannels);
-            this.proc.HighPass = this.highPass;
-            this.proc.NoiseSuppression = this.noiseSuppression;
-            this.proc.AGC = this.agc;
-            this.proc.AGCCompressionGain = this.agcCompressionGain;
-            this.proc.VAD = this.vad;
-            this.proc.Bypass = this.bypass;
+            this.proc.HighPass = this.HighPass;
+            this.proc.NoiseSuppression = this.NoiseSuppression;
+            this.proc.AGC = this.AGC;
+            this.proc.AGCCompressionGain = this.AgcCompressionGain;
+            this.proc.VAD = this.VAD;
+            this.proc.Bypass = this.Bypass;
             if (this.Logger.IsInfoEnabled)
             {
                 this.Logger.LogInfo("Initialized");
             }
-            return true;
         }
 
         private bool SetOrSwitchAudioListener(AudioListener listener, bool extraChecks, bool log = true)
@@ -754,13 +589,6 @@ namespace Photon.Voice.Unity
             }
             // multiple AudioOutCapture could be added to same GameObject
             AudioOutCapture[] captures = listener.GetComponents<AudioOutCapture>();
-            if (captures.Length > 1)
-            {
-                if (this.Logger.IsDebugEnabled)
-                {
-                    this.Logger.LogDebug("{0} AudioOutCapture components attached to the same GameObject, is this expected?", captures.Length);
-                }
-            }
             for (int i = 0; i < captures.Length; i++)
             {
                 if (this.SetOrSwitchAudioOutCapture(captures[i], false, false))
@@ -796,14 +624,7 @@ namespace Photon.Voice.Unity
             {
                 if (this.audioOutCapture != capture)
                 {
-                    if (!this.UnsubscribeFromAudioOutCapture(this.autoDestroyAudioOutCapture))
-                    {
-                        if (this.Logger.IsErrorEnabled) 
-                        {
-                            this.Logger.LogError("Could not unsubscribe from previous AudioOutCapture. Switching to a new one won't happen.");
-                        }
-                        return false;
-                    }
+                    this.UnsubscribeFromAudioOutCapture(this.autoDestroyAudioOutCapture);
                     audioOutSwitched = true;
                 }
                 else if (extraChecks)
@@ -837,13 +658,6 @@ namespace Photon.Voice.Unity
             if (this.audioListener == null)
             {
                 AudioOutCapture[] audioOutCaptures = FindObjectsOfType<AudioOutCapture>();
-                if (audioOutCaptures.Length > 1)
-                {
-                    if (this.Logger.IsDebugEnabled)
-                    {
-                        this.Logger.LogDebug("{0} AudioOutCapture components found, is this expected?", audioOutCaptures.Length);
-                    }
-                }
                 for(int i=0; i < audioOutCaptures.Length; i++)
                 {
                     AudioOutCapture capture = audioOutCaptures[i];
@@ -854,21 +668,10 @@ namespace Photon.Voice.Unity
                     }
                 }
                 AudioListener[] audioListeners = FindObjectsOfType<AudioListener>();
-                if (audioListeners.Length == 0)
-                {
-                    if (this.Logger.IsErrorEnabled)
-                    {
-                        this.Logger.LogError("No AudioListener component found, is this expected?");
-                    }
-                }
-                else if (audioListeners.Length > 1 && this.Logger.IsDebugEnabled)
-                {
-                    this.Logger.LogDebug("{0} AudioListener components found, is this expected?", audioListeners.Length);
-                }
                 for(int i=0; i < audioListeners.Length; i++)
                 {
                     AudioListener listener = audioListeners[i];
-                    if (this.SetOrSwitchAudioListener(listener, true, false))
+                    if (this.SetOrSwitchAudioListener(listener, false))
                     {
                         return true;
                     }
@@ -889,10 +692,6 @@ namespace Photon.Voice.Unity
                 if (this.aecStarted)
                 {
                     this.audioOutCapture.OnAudioFrame -= this.OnAudioOutFrameFloat;
-                    if (this.Logger.IsDebugEnabled)
-                    {
-                        this.Logger.LogDebug("OnAudioFrame event unsubscribed.");
-                    }
                 }
                 if (destroy)
                 {
@@ -904,10 +703,6 @@ namespace Photon.Voice.Unity
                     this.audioOutCapture = null;
                 }
                 return true;
-            } 
-            if (this.aecStarted && this.Logger.IsErrorEnabled)
-            {
-                this.Logger.LogError("Unexpected: audioOutCapture is null but aecStarted is true");
             }
             return false;
         }
@@ -997,10 +792,7 @@ namespace Photon.Voice.Unity
         /// <returns>Success or failure</returns>
         public bool SetOrSwitchAudioListener(AudioListener listener)
         {
-            lock (this.threadSafety)
-            {
-                return this.SetOrSwitchAudioListener(listener, true);
-            }
+            return this.SetOrSwitchAudioListener(listener, true);
         }
 
         /// <summary>
@@ -1010,15 +802,12 @@ namespace Photon.Voice.Unity
         /// <returns>Success or failure</returns>
         public bool SetOrSwitchAudioOutCapture(AudioOutCapture capture)
         {
-            lock (this.threadSafety)
+            if (this.SetOrSwitchAudioOutCapture(capture, true))
             {
-                if (this.SetOrSwitchAudioOutCapture(capture, true))
-                {
-                    this.autoDestroyAudioOutCapture = false;
-                    return true;
-                }
-                return false;
+                this.autoDestroyAudioOutCapture = false;
+                return true;
             }
+            return false;
         }
 
         #endregion

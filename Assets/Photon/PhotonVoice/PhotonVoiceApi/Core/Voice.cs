@@ -196,17 +196,20 @@ namespace Photon.Voice
         
         internal virtual void service()
         {
-            while (true)
+            if (this.voiceClient.transport.IsChannelJoined(this.channelId) && this.TransmitEnabled)
             {
-                FrameFlags f;
-                var x = encoder.DequeueOutput(out f);
-                if (x.Count == 0)
+                while (true)
                 {
-                    break;
-                }
-                else
-                {
-                    sendFrame(x, f);
+                    FrameFlags f;
+                    var x = encoder.DequeueOutput(out f);
+                    if (x.Count == 0)
+                    {
+                        break;
+                    }
+                    else
+                    {
+                        sendFrame(x, f);
+                    }
                 }
             }
             
@@ -235,10 +238,7 @@ namespace Photon.Voice
 
                 this.voiceClient.logger.LogInfo(LogPrefix + " Got config frame " + configFrame.Count + " bytes");
             }
-            if (this.voiceClient.transport.IsChannelJoined(this.channelId) && this.TransmitEnabled)
-            {
-                sendFrame0(compressed, flags, 0, Reliable);
-            }
+            sendFrame0(compressed, flags, 0, Reliable);
         }
 
         internal void sendFrame0(ArraySegment<byte> compressed, FrameFlags flags, int targetPlayerId, bool reliable)

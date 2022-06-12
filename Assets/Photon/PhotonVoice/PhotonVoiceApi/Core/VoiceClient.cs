@@ -365,14 +365,9 @@ namespace Photon.Voice
         /// <param name="channelId">Transport channel specific to transport.</param>
         /// <param name="encoder">Encoder compressing video data. Set to null to use default VP8 implementation.</param>
         /// <returns>Outgoing stream handler.</returns>
-        public LocalVoiceVideo CreateLocalVoiceVideo(VoiceInfo voiceInfo, IVideoRecorder recorder, int channelId = 0)
+        public LocalVoiceVideo CreateLocalVoiceVideo(VoiceInfo voiceInfo, IEncoder encoder, int channelId = 0)
         {
-            var lv = (LocalVoiceVideo)createLocalVoice(channelId, (vId, chId) => new LocalVoiceVideo(this, recorder.Encoder, vId, voiceInfo, chId));
-            if (recorder is IVideoRecorderPusher)
-            {
-                (recorder as IVideoRecorderPusher).VideoSink = lv;
-            }
-            return lv;
+            return (LocalVoiceVideo)createLocalVoice(channelId, (vId, chId) => new LocalVoiceVideo(this, encoder, vId, voiceInfo, chId));
         }
 #endif
 

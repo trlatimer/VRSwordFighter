@@ -17,7 +17,7 @@ MonoBehaviour:
     AppIdFusion: 
     AppIdChat: 
     AppIdVoice: aebf25a3-a205-40a5-ba94-2af5804f649e
-    AppVersion: 
+    AppVersion: .1
     UseNameServer: 1
     FixedRegion: 
     Server: 
@@ -28,7 +28,7 @@ MonoBehaviour:
     AuthMode: 0
     EnableLobbyStatistics: 0
     NetworkLogging: 1
-  DevRegion: 
+  DevRegion: usw
   PunLogging: 0
   EnableSupportLogger: 0
   RunInBackground: 1
@@ -36,12 +36,24 @@ MonoBehaviour:
   RpcList:
   - ClickRpc
   - DestroyRpc
-  - DestroySpaceship
-  - Fire
-  - RespawnSpaceship
+  - ChangeScene
+  - AddKill
+  - DamageFlash
+  - Die
+  - Heal
+  - ImInGame
+  - Initialize
+  - SpawnPlayer
+  - TakeDamage
+  - WinGame
+  - UpdateLobbyUI
+  - StartNetworkGrabbing
+  - StopNetworkGrabbing
   - CantHearYou
   - ChangeColour
   - HeresWhy
+  - GiveAmmo
+  - SpawnBullet
   DisableAutoOpenWizard: 1
   ShowSettings: 1
-  DevRegionSetOnce: 0
+  DevRegionSetOnce: 1

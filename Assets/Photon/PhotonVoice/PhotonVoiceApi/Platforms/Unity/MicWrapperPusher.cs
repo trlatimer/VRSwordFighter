@@ -76,7 +76,7 @@ namespace Photon.Voice.Unity
                     return;
                 }
                 this.audioOutCapture = this.audioSource.gameObject.GetComponent<AudioOutCapture>();
-                if (ReferenceEquals(null, this.audioOutCapture) || !this.audioOutCapture)
+                if (!this.audioOutCapture || this.audioOutCapture == null)
                 {
                     this.audioOutCapture = this.audioSource.gameObject.AddComponent<AudioOutCapture>();
                 }
@@ -156,7 +156,7 @@ namespace Photon.Voice.Unity
                     if (!gO.activeSelf)
                     {
                         this.logger.LogWarning("[PV] MicWrapperPusher: AudioSource GameObject inactive, activating it.");
-                        gO.SetActive(true);
+                        this.audioSource.gameObject.SetActive(true);
                     }
                     if (!gO.activeInHierarchy)
                     {
@@ -165,7 +165,7 @@ namespace Photon.Voice.Unity
                         return;
                     }
                     this.audioSource = gO.GetComponent<AudioSource>();
-                    if (ReferenceEquals(null, this.audioSource) || !this.audioSource)
+                    if (!this.audioSource || this.audioSource == null)
                     {
                         this.audioSource = gO.AddComponent<AudioSource>();
                     }
@@ -186,7 +186,7 @@ namespace Photon.Voice.Unity
                         return;
                     }
                     this.audioOutCapture = this.audioSource.gameObject.GetComponent<AudioOutCapture>();
-                    if (ReferenceEquals(null, this.audioOutCapture) || !this.audioOutCapture)
+                    if (!this.audioOutCapture || this.audioOutCapture == null)
                     {
                         this.audioOutCapture = this.audioSource.gameObject.AddComponent<AudioOutCapture>();
                     }
@@ -256,7 +256,7 @@ namespace Photon.Voice.Unity
                     frequency = maxFreq;
                 }
                 GameObject gO = new GameObject("[PV] MicWrapperPusher: AudioSource + AudioOutCapture");
-                if (ReferenceEquals(null, parentTransform) || !parentTransform)
+                if (!parentTransform || parentTransform == null)
                 {
                     this.logger.LogWarning("[PV] MicWrapperPusher: Parent transform passed is destroyed or null. Creating AudioSource GameObject at root.");
                 }
@@ -266,7 +266,7 @@ namespace Photon.Voice.Unity
                     if (!gO.activeSelf)
                     {
                         this.logger.LogWarning("[PV] MicWrapperPusher: AudioSource GameObject inactive, activating it.");
-                        gO.gameObject.SetActive(true);
+                        this.audioSource.gameObject.SetActive(true);
                     }
                     if (!gO.activeInHierarchy)
                     {
@@ -304,6 +304,11 @@ namespace Photon.Voice.Unity
             {
                 this.logger.LogWarning("[PV] MicWrapperPusher: channels number mismatch; expected:{0} got:{1}.", this.Channels, channelsNumber);
             }
+            // use channels to determine length? assume it's 1?
+            //int len = frame.Length;
+            //float[] bufManaged = this.pushBufferFactory.New(len);
+            //Array.Copy(frame, bufManaged, frame.Length);
+            //this.callback(bufManaged);
             if (this.frame2.Length != frame.Length)
             {
                 this.frame2 = new float[frame.Length];
@@ -314,11 +319,13 @@ namespace Photon.Voice.Unity
         }
 
         private Action<float[]> pushCallback;
+        //private ObjectFactory<float[], int> pushBufferFactory;
 
 
         public void SetCallback(Action<float[]> callback, ObjectFactory<float[], int> bufferFactory)
         {
             this.pushCallback = callback;
+            //this.pushBufferFactory = bufferFactory;
             this.audioOutCapture.OnAudioFrame += this.AudioOutCaptureOnOnAudioFrame;
         }
 
