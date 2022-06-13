@@ -3431,11 +3431,6 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 089d38c2beff1f044b446797593d7269, type: 3}
---- !u!1 &5764012044403190835 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 3653637840890810929, guid: 089d38c2beff1f044b446797593d7269, type: 3}
-  m_PrefabInstance: {fileID: 9027947213095009794}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &4400114101981882528 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 4636999383082096290, guid: 089d38c2beff1f044b446797593d7269, type: 3}
@@ -3451,9 +3446,14 @@ MeshRenderer:
   m_CorrespondingSourceObject: {fileID: 3323691380301724783, guid: 089d38c2beff1f044b446797593d7269, type: 3}
   m_PrefabInstance: {fileID: 9027947213095009794}
   m_PrefabAsset: {fileID: 0}
---- !u!4 &6396585474784741676 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 2705689969903974190, guid: 089d38c2beff1f044b446797593d7269, type: 3}
+--- !u!1 &3724941356872195917 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5690316021177917775, guid: 089d38c2beff1f044b446797593d7269, type: 3}
+  m_PrefabInstance: {fileID: 9027947213095009794}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &1879929757312260434 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 7448791120723175248, guid: 089d38c2beff1f044b446797593d7269, type: 3}
   m_PrefabInstance: {fileID: 9027947213095009794}
   m_PrefabAsset: {fileID: 0}
 --- !u!4 &7725997985080356471 stripped
@@ -3471,8 +3471,71 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 201407631523307094, guid: 089d38c2beff1f044b446797593d7269, type: 3}
   m_PrefabInstance: {fileID: 9027947213095009794}
   m_PrefabAsset: {fileID: 0}
+--- !u!4 &6396585474784741676 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 2705689969903974190, guid: 089d38c2beff1f044b446797593d7269, type: 3}
+  m_PrefabInstance: {fileID: 9027947213095009794}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &5764012044403190835 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 3653637840890810929, guid: 089d38c2beff1f044b446797593d7269, type: 3}
+  m_PrefabInstance: {fileID: 9027947213095009794}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &8765900101059042848 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 355517853944651810, guid: 089d38c2beff1f044b446797593d7269, type: 3}
   m_PrefabInstance: {fileID: 9027947213095009794}
   m_PrefabAsset: {fileID: 0}
+--- !u!65 &5973204806575496975
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1879929757312260434}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 0.07440561, y: 0.20813866, z: 0.27744856}
+  m_Center: {x: -0.015310376, y: -0.021322094, z: 0.010715798}
+--- !u!65 &6270954058097060564
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3724941356872195917}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 0.07440561, y: 0.20813866, z: 0.27744856}
+  m_Center: {x: 0.015310376, y: -0.021322094, z: 0.010715798}
+--- !u!136 &8749487518630148656
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4400114101981882528}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  m_Radius: 0.2070758
+  m_Height: 0.65059394
+  m_Direction: 1
+  m_Center: {x: 0, y: 0.3463098, z: 0}
+--- !u!135 &1753891607147775826
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8897557190347224675}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 0.15
+  m_Center: {x: 0, y: 0.2, z: -0.004480593}

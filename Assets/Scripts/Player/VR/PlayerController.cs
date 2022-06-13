@@ -50,6 +50,7 @@ public class PlayerController : MonoBehaviourPun
     [PunRPC]
     public void TakeDamage(int attackerId, float damage)
     {
+        Debug.Log("Delivering damage");
         if (dead) return;
 
         curHP -= damage;

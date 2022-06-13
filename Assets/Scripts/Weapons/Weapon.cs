@@ -54,10 +54,15 @@ public class Weapon : MonoBehaviour
     private void DeliverDamage(int attackerId, GameObject receiver, float damage)
     {
         // deliver damage to receiver
-        PlayerController controller = receiver.GetComponent<PlayerController>();
+        PlayerController controller = receiver.transform.root.GetComponent<PlayerController>();
         if (controller != null)
         {
+            Debug.Log("Found controller, sending damage");
             controller.TakeDamage(attackerId, damage);
+        }
+        else
+        {
+            Debug.Log("No controller found");
         }
     }
 }
