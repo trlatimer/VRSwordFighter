@@ -1909,8 +1909,8 @@ GameObject:
   - component: {fileID: 8451943839116751526}
   - component: {fileID: 8451943839116751529}
   - component: {fileID: 8451943839116751530}
-  - component: {fileID: 8451943839116751534}
   - component: {fileID: 8096723017684456933}
+  - component: {fileID: 443411118}
   m_Layer: 0
   m_Name: XR Origin
   m_TagString: Player
@@ -2065,7 +2065,22 @@ CharacterController:
   m_SkinWidth: 0.08
   m_MinMoveDistance: 0.001
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &8451943839116751534
+--- !u!114 &8096723017684456933
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8451943839116751527}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: af6bf904e410ee8479f9093d8830d1f8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_LocomotionProvider: {fileID: 8451943839116751525}
+  m_MinHeight: 1
+  m_MaxHeight: Infinity
+--- !u!114 &443411118
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -2083,26 +2098,11 @@ MonoBehaviour:
   controller: {fileID: 8451943839116751530}
   AvatarHand_Left: {fileID: 6396585474784741676}
   AvatarHand_Right: {fileID: 7725997985080356471}
-  XRHead: {fileID: 8451943839318944153}
+  XRHead: {fileID: 9187973277253804116}
   XRHand_Left: {fileID: 8451943838703629222}
   XRHand_Right: {fileID: 8451943840339258982}
   headPositionOffset: {x: 0, y: -1, z: 0}
   handRotationOffset: {x: 0, y: 0, z: 0}
---- !u!114 &8096723017684456933
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8451943839116751527}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: af6bf904e410ee8479f9093d8830d1f8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_LocomotionProvider: {fileID: 8451943839116751525}
-  m_MinHeight: 1
-  m_MaxHeight: Infinity
 --- !u!1 &8451943839318944154
 GameObject:
   m_ObjectHideFlags: 0
@@ -3423,6 +3423,22 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 355517853944651810, guid: 089d38c2beff1f044b446797593d7269, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1617342106925813877, guid: 089d38c2beff1f044b446797593d7269, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1617342106925813877, guid: 089d38c2beff1f044b446797593d7269, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1617342106925813877, guid: 089d38c2beff1f044b446797593d7269, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1617342106925813877, guid: 089d38c2beff1f044b446797593d7269, type: 3}
+      propertyPath: m_LocalRotation.z
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3653637840890810929, guid: 089d38c2beff1f044b446797593d7269, type: 3}

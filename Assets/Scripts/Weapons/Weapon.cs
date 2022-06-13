@@ -10,8 +10,8 @@ public class Weapon : MonoBehaviour
     [Header("Stats")]
     public int damage;
 
-    private PhotonView photonView;
-    private PlayerController currPlayer;
+    public PhotonView photonView;
+    public PlayerController currPlayer;
 
     private void Awake()
     {
@@ -21,7 +21,7 @@ public class Weapon : MonoBehaviour
     // When grabbed, we need to tell the PlayerController that we have a weapon so we can shoot
     public void SetWeaponOwner(SelectEnterEventArgs selectEnterEventArgs)
     {
-        PlayerController interactorController = selectEnterEventArgs.interactorObject.transform.gameObject.GetComponentInParent<PlayerController>();
+        PlayerController interactorController = selectEnterEventArgs.interactorObject.transform.root.GetComponent<PlayerController>();
         if (interactorController != null)
         {
             currPlayer = interactorController;
@@ -32,10 +32,10 @@ public class Weapon : MonoBehaviour
     // When dropped, we need to clear the weapon from the PlayerController so we don't continue shooting
     public void ReleaseWeaponOwner(SelectExitEventArgs selectExitEventArgs)
     {
-        PlayerController interactorController = selectExitEventArgs.interactorObject.transform.gameObject.GetComponentInParent<PlayerController>();
+        PlayerController interactorController = selectExitEventArgs.interactorObject.transform.root.GetComponent<PlayerController>();
         if (interactorController != null)
         {
-            photonView = null;
+            currPlayer = null;
             interactorController.grabbedWeapon = null;
         }
     }
@@ -43,11 +43,18 @@ public class Weapon : MonoBehaviour
     private void OnCollisionEnter(Collision collision)
     {
         Debug.Log("Collision with: " + collision.gameObject.name);
-        if (collision.gameObject.GetComponent<PlayerController>() != null)
+        Debug.Log("Root is: " + collision.transform.root.name);
+        if (collision.transform.root.GetComponent<PlayerController>() != null)
         {
-            photonView.RPC("DeliverDamage", collision.gameObject.GetComponent<PhotonView>().Owner, currPlayer.photonPlayer.ActorNumber, collision.gameObject, damage);
-                
+            Debug.Log(collision.transform.root.GetComponent<PhotonView>().Controller);
+            Debug.Log(currPlayer.photonPlayer.ActorNumber);
+            photonView.RPC("DeliverDamage", collision.transform.root.GetComponent<PhotonView>().Controller, photonView.ControllerActorNr, collision.gameObject, damage);            
         }
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        Debug.Log("Trigger with " + other.name);
     }
 
     [PunRPC]
