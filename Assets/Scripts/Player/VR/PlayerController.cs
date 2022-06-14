@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
 using Photon.Realtime;
+using UnityEngine.UI;
 
 public class PlayerController : MonoBehaviourPun
 {
@@ -24,6 +25,7 @@ public class PlayerController : MonoBehaviourPun
     //public Rigidbody rig;
     public Player photonPlayer;
     //public PlayerWeapon weapon;
+    public Image healthImage;
     public MeshRenderer mr;
 
     [PunRPC]
@@ -43,7 +45,7 @@ public class PlayerController : MonoBehaviourPun
         }
         else
         {
-            //GameUI.instance.Initialize(this);
+            GUI.instance.Initialize(this);
         }
     }
 
@@ -60,7 +62,7 @@ public class PlayerController : MonoBehaviourPun
         photonView.RPC("DamageFlash", RpcTarget.Others);
 
         // Update Health UI
-        //GameUI.instance.UpdateHealthBar();
+        GUI.instance.UpdateHealthBar();
 
         // Die if no health
         if (curHP <= 0)
@@ -121,7 +123,7 @@ public class PlayerController : MonoBehaviourPun
         kills++;
 
         // Update UI
-        //GameUI.instance.UpdatePlayerInfoText();
+        GUI.instance.UpdateInfoText();
     }
 
     [PunRPC]
@@ -130,6 +132,6 @@ public class PlayerController : MonoBehaviourPun
         curHP = Mathf.Clamp(curHP + amount, 0, maxHP);
 
         // Update UI
-        //GameUI.instance.UpdateHealthBar();
+        GUI.instance.UpdateHealthBar();
     }
 }
