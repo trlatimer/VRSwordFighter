@@ -40,21 +40,11 @@ public class Weapon : MonoBehaviour
         }
     }
 
-    private void OnCollisionEnter(Collision collision)
-    {
-        Debug.Log("Collision with: " + collision.gameObject.name);
-        Debug.Log("Root is: " + collision.transform.root.name);
-        if (collision.transform.root.GetComponent<PlayerController>() != null)
-        {
-            Debug.Log(collision.transform.root.GetComponent<PhotonView>().Controller);
-            Debug.Log(currPlayer.photonPlayer.ActorNumber);
-            photonView.RPC("DeliverDamage", collision.transform.root.GetComponent<PhotonView>().Controller, photonView.ControllerActorNr, collision.gameObject, damage);            
-        }
-    }
-
     private void OnTriggerEnter(Collider other)
     {
         Debug.Log("Trigger with " + other.name);
+        if (other.transform.root.GetComponent<PlayerController>() != null)
+            photonView.RPC("DeliverDamage", other.transform.root.GetComponent<PhotonView>().Controller, photonView.ControllerActorNr, other.gameObject, damage);
     }
 
     [PunRPC]
