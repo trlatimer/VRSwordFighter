@@ -42,23 +42,18 @@ public class Weapon : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (currPlayer != null && other.transform.root.GetComponent<PlayerController>() != null)
-            photonView.RPC("DeliverDamage", other.transform.root.GetComponent<PhotonView>().Controller, photonView.ControllerActorNr, other.gameObject, damage);
+        if (currPlayer == null) return;
+        if (other.transform.root.GetComponent<PlayerController>() != null && currPlayer.id != other.transform.root.GetComponent<PlayerController>().id) return;
+
+        if (other.transform.root.GetComponent<IDamageable>() != null)
+            photonView.RPC("DeliverDamage", other.transform.root.GetComponent<PhotonView>().Controller, currPlayer.id, other.gameObject, damage);
     }
 
     [PunRPC]
     private void DeliverDamage(int attackerId, GameObject receiver, float damage)
     {
-        // deliver damage to receiver
-        PlayerController controller = receiver.transform.root.GetComponent<PlayerController>();
-        if (controller != null)
-        {
-            Debug.Log("Found controller, sending damage");
-            controller.TakeDamage(attackerId, damage);
-        }
-        else
-        {
-            Debug.Log("No controller found");
-        }
+        IDamageable damageable = receiver.transform.root.GetComponent<IDamageable>();
+        if (damageable != null)
+            damageable.TakeDamage(attackerId, damage);
     }
 }
