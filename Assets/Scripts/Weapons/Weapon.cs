@@ -12,10 +12,14 @@ public class Weapon : MonoBehaviour
 
     public PhotonView photonView;
     public PlayerController currPlayer;
+    public XRGrabInteractable interactable;
+    public Rigidbody rig;
 
     private void Awake()
     {
         photonView = GetComponent<PhotonView>();
+        interactable = GetComponent<XRGrabInteractable>();
+        rig = GetComponent<Rigidbody>();
     }
 
     // When grabbed, we need to tell the PlayerController that we have a weapon so we can shoot
@@ -46,7 +50,19 @@ public class Weapon : MonoBehaviour
         if (other.transform.root.GetComponent<PlayerController>() != null && currPlayer.id != other.transform.root.GetComponent<PlayerController>().id) return;
 
         if (other.transform.root.GetComponent<IDamageable>() != null)
+        { 
             photonView.RPC("DeliverDamage", other.transform.root.GetComponent<PhotonView>().Controller, currPlayer.id, other.gameObject, damage);
+            ForceDrop();
+        }
+            
+    }
+
+    IEnumerator ForceDrop()
+    {
+        interactable.enabled = false;
+        rig.isKinematic = true;
+        yield return new WaitForSeconds(1);
+        interactable.enabled = true;
     }
 
     [PunRPC]
