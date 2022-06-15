@@ -3607,6 +3607,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxPlayers: 10
+  menuCanvas: {fileID: 0}
 --- !u!114 &675372330
 MonoBehaviour:
   m_ObjectHideFlags: 0

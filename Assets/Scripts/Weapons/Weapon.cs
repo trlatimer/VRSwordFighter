@@ -8,7 +8,7 @@ using UnityEngine.XR.Interaction.Toolkit;
 public class Weapon : MonoBehaviour
 {
     [Header("Stats")]
-    public int damage;
+    public float damage;
 
     public PhotonView photonView;
     public PlayerController currPlayer;
@@ -42,8 +42,7 @@ public class Weapon : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        Debug.Log("Trigger with " + other.name);
-        if (other.transform.root.GetComponent<PlayerController>() != null)
+        if (currPlayer != null && other.transform.root.GetComponent<PlayerController>() != null)
             photonView.RPC("DeliverDamage", other.transform.root.GetComponent<PhotonView>().Controller, photonView.ControllerActorNr, other.gameObject, damage);
     }
 

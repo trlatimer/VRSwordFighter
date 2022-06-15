@@ -11,16 +11,19 @@ public class GUI : MonoBehaviour
     public TMPro.TextMeshProUGUI playerText;
     public Image healthBar;
 
-    private PlayerController playerController;
+    public PlayerController playerController;
 
-    private void Start()
+    private void Awake()
     {
         instance = this;
     }
 
     public void Initialize(PlayerController controller)
     {
+        Debug.Log("Initializing GUI with: " + controller.photonPlayer.NickName);
         playerController = controller;
+        UpdateHealthBar();
+        UpdateInfoText();
     }
 
     public void UpdateHealthBar()

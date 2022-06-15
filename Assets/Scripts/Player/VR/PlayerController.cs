@@ -14,7 +14,7 @@ public class PlayerController : MonoBehaviourPun
     [Header("Stats")]
     public float curHP;
     public float maxHP;
-    public int kills;
+    public int kills = 0;
     public bool dead;
 
     public Weapon grabbedWeapon;
@@ -37,6 +37,7 @@ public class PlayerController : MonoBehaviourPun
         // Add to players list
         GameManager.instance.players[id - 1] = this;
 
+        Debug.Log("initializing PlayerController: IsMine - " + photonView.IsMine);
         // not local player
         if (!photonView.IsMine)
         {
@@ -45,6 +46,8 @@ public class PlayerController : MonoBehaviourPun
         }
         else
         {
+            Debug.Log("Calling initialize for GUI");
+
             GUI.instance.Initialize(this);
         }
     }
