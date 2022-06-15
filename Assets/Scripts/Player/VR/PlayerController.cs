@@ -37,7 +37,6 @@ public class PlayerController : MonoBehaviourPun, IDamageable
         // Add to players list
         GameManager.instance.players[id - 1] = this;
 
-        Debug.Log("initializing PlayerController: IsMine - " + photonView.IsMine);
         // not local player
         if (!photonView.IsMine)
         {
@@ -46,8 +45,6 @@ public class PlayerController : MonoBehaviourPun, IDamageable
         }
         else
         {
-            Debug.Log("Calling initialize for GUI");
-
             GUI.instance.Initialize(this);
         }
     }

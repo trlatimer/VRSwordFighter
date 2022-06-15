@@ -47,12 +47,12 @@ public class Weapon : MonoBehaviour
     private void OnTriggerEnter(Collider other)
     {
         if (currPlayer == null) return;
-        if (other.transform.root.GetComponent<PlayerController>() != null && currPlayer.id != other.transform.root.GetComponent<PlayerController>().id) return;
+        if (other.transform.root.GetComponent<PlayerController>() != null && currPlayer.id == other.transform.root.GetComponent<PlayerController>().id) return;
 
         if (other.transform.root.GetComponent<IDamageable>() != null)
         { 
             photonView.RPC("DeliverDamage", other.transform.root.GetComponent<PhotonView>().Controller, currPlayer.id, other.gameObject, damage);
-            ForceDrop();
+            StartCoroutine(ForceDrop());
         }
             
     }
@@ -61,6 +61,8 @@ public class Weapon : MonoBehaviour
     {
         interactable.enabled = false;
         rig.isKinematic = true;
+        rig.useGravity = false;
+        rig.freezeRotation = true;
         yield return new WaitForSeconds(1);
         interactable.enabled = true;
     }
