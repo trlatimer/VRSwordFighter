@@ -4,6 +4,7 @@ using UnityEngine;
 using Photon.Pun;
 using Photon.Realtime;
 using UnityEngine.UI;
+using UnityEngine.XR.Interaction.Toolkit;
 
 public class PlayerController : MonoBehaviourPun, IDamageable
 {
@@ -27,6 +28,8 @@ public class PlayerController : MonoBehaviourPun, IDamageable
     //public PlayerWeapon weapon;
     public Image healthImage;
     public MeshRenderer mr;
+    public Canvas deathCanvas;
+    public LocomotionSystem locomotionSystem;
 
     [PunRPC]
     public void Initialize(Player player)
@@ -108,12 +111,16 @@ public class PlayerController : MonoBehaviourPun, IDamageable
             if (curAttackerId != 0)
                 GameManager.instance.GetPlayer(curAttackerId).photonView.RPC("AddKill", RpcTarget.All);
 
+            deathCanvas.gameObject.SetActive(true);
+            locomotionSystem.enabled = false;
+
             // Set cam to spectator
             //GetComponentInChildren<CameraController>().SetAsSpectator();
 
             // Disable physics, hide player
             //rig.isKinematic = true;
             //transform.position = new Vector3(0, -50, 0);
+
         }
     }
 
